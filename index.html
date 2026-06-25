@@ -1,54 +1,133 @@
-<div id="results"></div>
-<button id="backBtn" onclick="goBack()" style="display:none;width:100%;padding:12px;border-radius:10px;border:2px solid #FF3B3B;background:transparent;color:#FF3B3B;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px">✕ Back to Search</button>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>MEDI-CALL — Kenya Hospital Finder</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #080C14;
       font-family: sans-serif;
-      display: flex;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      background: #FF3B3B;
+      padding: 16px;
+      text-align: center;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .header h2 {
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* PAGES */
+    .page {
+      display: none;
+      padding-top: 70px;
+      min-height: 100vh;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding-top: 60px;
+      flex-direction: column;
     }
 
-    .container {
-      text-align: center;
-      padding: 40px 20px;
+    .page.active {
+      display: flex;
+    }
+
+    /* LOGIN PAGE */
+    .login-box {
+      background: #131D2E;
+      border: 1px solid #1E2D42;
+      border-radius: 20px;
+      padding: 40px 30px;
       width: 90%;
       max-width: 400px;
+      text-align: center;
     }
 
-    .logo {
-      font-size: 50px;
-      margin-bottom: 10px;
-    }
+    .login-box .logo { font-size: 50px; margin-bottom: 10px; }
 
-    h1 {
+    .login-box h1 { color: white; font-size: 28px; margin-bottom: 6px; }
+    .login-box h1 span { color: #FF3B3B; }
+
+    .login-box p { color: #64748B; font-size: 13px; margin-bottom: 24px; }
+
+    .login-box input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #1E2D42;
+      background: #080C14;
       color: white;
-      font-size: 36px;
-      margin-bottom: 8px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      display: block;
     }
 
-    h1 span {
+    .login-box input::placeholder { color: #64748B; }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      background: #FF3B3B;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: 2px solid #FF3B3B;
+      background: transparent;
       color: #FF3B3B;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
     }
 
-    .tagline {
+    .skip-btn {
       color: #64748B;
-      margin-bottom: 24px;
-      font-size: 14px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      margin-top: 8px;
     }
+
+    /* MAIN APP */
+    .container {
+      text-align: center;
+      padding: 20px;
+      width: 95%;
+      max-width: 500px;
+    }
+
+    .logo { font-size: 50px; margin-bottom: 10px; }
+
+    h1 { color: white; font-size: 32px; margin-bottom: 8px; }
+    h1 span { color: #FF3B3B; }
+
+    .tagline { color: #64748B; margin-bottom: 24px; font-size: 14px; }
 
     #search {
       width: 100%;
@@ -116,53 +195,182 @@
       display: block;
     }
 
-    .header {
-      background: #FF3B3B;
-      padding: 16px;
-      text-align: center;
+    #backBtn {
       width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #64748B;
+      background: transparent;
+      color: #64748B;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 12px;
+      display: none;
     }
 
-    .header h2 {
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
+    /* USER MENU */
+    .user-menu {
+      position: fixed;
+      top: 10px;
+      right: 16px;
+      z-index: 200;
     }
+
+    .user-icon {
+      background: white;
+      color: #FF3B3B;
+      border: none;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    /* ABOUT SECTION */
+    .about {
+      background: #131D2E;
+      border: 1px solid #1E2D42;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 16px 0;
+      text-align: left;
+    }
+
+    .about h3 { color: #FF3B3B; font-size: 14px; margin-bottom: 8px; }
+    .about p { color: #64748B; font-size: 13px; line-height: 1.6; }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #1E2D42;
+      margin-top: 20px;
+    }
+
+    .footer p { color: #64748B; font-size: 12px; margin-bottom: 4px; }
+    .footer span { color: #FF3B3B; }
   </style>
 </head>
 <body>
 
+  <!-- HEADER -->
   <div class="header">
     <h2>🚑 MEDI-CALL — Kenya Hospital Finder</h2>
   </div>
 
-  <div class="container">
-    <div class="logo">🚑</div>
-    <h1>MEDI<span>CALL</span></h1>
-    <p class="tagline">Find help. Fast. Anywhere in Kenya.</p>
+  <!-- USER ICON -->
+  <div class="user-menu">
+    <button class="user-icon" onclick="showLogin()">👤</button>
+  </div>
 
-    <input id="search" type="text" placeholder="Enter town e.g Nakuru">
+  <!-- LOGIN PAGE -->
+  <div class="page active" id="loginPage">
+    <div class="login-box">
+      <div class="logo">🚑</div>
+      <h1>MEDI<span>CALL</span></h1>
+      <p>Kenya's fastest hospital finder</p>
 
-    <select id="filter">
-      <option value="">All Services</option>
-      <option value="maternity">Maternity</option>
-      <option value="emergency">Emergency</option>
-      <option value="general">General</option>
-    </select>
+      <input type="text" id="userName" placeholder="Your Name">
+      <input type="email" id="userEmail" placeholder="Email Address">
+      <input type="password" id="userPass" placeholder="Password">
 
-    <button id="gpsBtn" onclick="getLocation()">📍 Use My Location</button>
-    <button id="findBtn">🏥 Find Hospital</button>
-    <button id="sosBtn">🚨 EMERGENCY CALL</button>
+      <button class="login-btn" onclick="login()">Log In</button>
+      <button class="signup-btn" onclick="signup()">Create Account</button>
+      <button class="skip-btn" onclick="skipLogin()">Skip — Continue as Guest</button>
+    </div>
+  </div>
 
-    <div id="results"></div>
+  <!-- MAIN APP PAGE -->
+  <div class="page" id="mainPage">
+    <div class="container">
+      <div class="logo">🚑</div>
+      <h1>MEDI<span>CALL</span></h1>
+      <p class="tagline">Find help. Fast. Anywhere in Kenya.</p>
+
+      <div class="about">
+        <h3>🇰🇪 About MEDI-CALL</h3>
+        <p>In an emergency, every second counts. You shouldn't have to explain where you are. MEDI-CALL finds the nearest hospital instantly — no dispatcher needed, 24/7, anywhere in Kenya.</p>
+      </div>
+
+      <input id="search" type="text" placeholder="Enter town e.g Nakuru">
+
+      <select id="filter">
+        <option value="">All Services</option>
+        <option value="maternity">Maternity</option>
+        <option value="emergency">Emergency</option>
+        <option value="general">General</option>
+      </select>
+
+      <button id="gpsBtn" onclick="getLocation()">📍 Use My Location</button>
+      <button id="findBtn">🏥 Find Hospital</button>
+      <button id="sosBtn">🚨 EMERGENCY CALL</button>
+
+      <div id="results"></div>
+
+      <button id="backBtn" onclick="goBack()">✕ Back to Search</button>
+
+      <div class="footer">
+        <p>© 2026 <span>MEDI-CALL</span> — Built for Kenya 🇰🇪</p>
+        <p>Saving lives one tap at a time 🚑</p>
+      </div>
+    </div>
   </div>
 
   <script>
+    var currentUser = null;
+
+    // LOGIN FUNCTIONS
+    function login() {
+      var name = document.getElementById('userName').value;
+      var email = document.getElementById('userEmail').value;
+      if (name === '' || email === '') {
+        alert('Please enter your name and email!');
+        return;
+      }
+      currentUser = name;
+      showMain();
+    }
+
+    function signup() {
+      var name = document.getElementById('userName').value;
+      var email = document.getElementById('userEmail').value;
+      var pass = document.getElementById('userPass').value;
+      if (name === '' || email === '' || pass === '') {
+        alert('Please fill in all fields!');
+        return;
+      }
+      currentUser = name;
+      alert('Welcome to MEDI-CALL, ' + name + '! 🚑');
+      showMain();
+    }
+
+    function skipLogin() {
+      currentUser = 'Guest';
+      showMain();
+    }
+
+    function showLogin() {
+      document.getElementById('loginPage').classList.add('active');
+      document.getElementById('mainPage').classList.remove('active');
+    }
+
+    function showMain() {
+      document.getElementById('loginPage').classList.remove('active');
+      document.getElementById('mainPage').classList.add('active');
+    }
+
+    // BACK BUTTON
+    function goBack() {
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('backBtn').style.display = 'none';
+      document.getElementById('search').value = '';
+      document.getElementById('filter').value = '';
+    }
+
+    // HOSPITALS DATABASE
     var hospitals = [
       { name: "Mediheal Hospital", town: "Nakuru", phone: "0717877865", emergency: true, services: "general maternity emergency" },
       { name: "Valley Hospital", town: "Nakuru", phone: "0512214207", emergency: true, services: "general maternity emergency" },
@@ -235,21 +443,23 @@
         var html = '<h3 style="color:white;margin:20px 0 10px">Found ' + found.length + ' hospital(s):</h3>';
         found.forEach(function(h) {
           html += '<div style="background:#131D2E;border:1px solid #1E2D42;border-radius:10px;padding:16px;margin-bottom:10px;text-align:left">';
-          html += '<p style="color:white;font-weight:700;margin-bottom:6px">🏥 ' + h.name + '</p>';
-          html += '<p style="color:#64748B;margin-bottom:6px">📍 ' + h.town + '</p>';
+          html += '<p style="color:white;font-weight:700;margin-bottom:6px;font-size:15px">🏥 ' + h.name + '</p>';
+          html += '<p style="color:#64748B;margin-bottom:6px;font-size:13px">📍 ' + h.town + '</p>';
           if (h.emergency) {
-            html += '<span style="background:rgba(255,59,59,0.2);color:#FF3B3B;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px">🚨 Emergency</span> ';
+            html += '<span style="background:rgba(255,59,59,0.2);color:#FF3B3B;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:8px">🚨 Emergency</span> ';
           }
-          html += '<span style="background:rgba(34,197,94,0.2);color:#22C55E;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px">' + h.services + '</span>';
-          html += '<br><a href="tel:' + h.phone + '" style="background:#FF3B3B;color:white;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:8px">📞 Call ' + h.phone + '</a>';
+          html += '<span style="background:rgba(34,197,94,0.2);color:#22C55E;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:8px">' + h.services + '</span>';
+          html += '<br><a href="tel:' + h.phone + '" style="background:#FF3B3B;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:8px;font-size:14px">📞 Call ' + h.phone + '</a>';
           html += '</div>';
         });
         results.innerHTML = html;
+        document.getElementById('backBtn').style.display = 'block';
       }
     };
 
     document.getElementById('sosBtn').onclick = function() {
-      document.getElementById('results').innerHTML = '<div style="background:#C0392B;border-radius:10px;padding:16px;margin-top:20px"><p style="color:white;font-weight:700;font-size:18px">🚨 EMERGENCY MODE</p><p style="color:white;margin-top:8px">Nearest hospital: Mediheal Hospital</p><a href="tel:0717877865" style="background:white;color:#C0392B;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:10px">📞 Call Now — 0717877865</a></div>';
+      document.getElementById('results').innerHTML = '<div style="background:#C0392B;border-radius:10px;padding:20px;margin-top:20px"><p style="color:white;font-weight:700;font-size:18px">🚨 EMERGENCY MODE</p><p style="color:white;margin-top:8px;font-size:14px">Nearest hospital: Mediheal Hospital, Nakuru</p><a href="tel:0717877865" style="background:white;color:#C0392B;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:12px;font-size:15px">📞 Call Now — 0717877865</a></div>';
+      document.getElementById('backBtn').style.display = 'block';
     };
 
     function getLocation() {
