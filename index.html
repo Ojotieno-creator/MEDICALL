@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDI-CALL — Kenya Hospital Finder</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #080C14;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding-top: 60px;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px 20px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .logo {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: white;
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    h1 span {
+      color: #FF3B3B;
+    }
+
+    .tagline {
+      color: #64748B;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #1E2D42;
+      background: #131D2E;
+      color: white;
+      font-size: 15px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    #filter {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #1E2D42;
+      background: #131D2E;
+      color: white;
+      font-size: 15px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    #gpsBtn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #22C55E;
+      background: transparent;
+      color: #22C55E;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    #findBtn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      background: #FF3B3B;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    #sosBtn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      background: #C0392B;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .header {
+      background: #FF3B3B;
+      padding: 16px;
+      text-align: center;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .header h2 {
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>🚑 MEDI-CALL — Kenya Hospital Finder</h2>
+  </div>
+
+  <div class="container">
+    <div class="logo">🚑</div>
+    <h1>MEDI<span>CALL</span></h1>
+    <p class="tagline">Find help. Fast. Anywhere in Kenya.</p>
+
+    <input id="search" type="text" placeholder="Enter town e.g Nakuru">
+
+    <select id="filter">
+      <option value="">All Services</option>
+      <option value="maternity">Maternity</option>
+      <option value="emergency">Emergency</option>
+      <option value="general">General</option>
+    </select>
+
+    <button id="gpsBtn" onclick="getLocation()">📍 Use My Location</button>
+    <button id="findBtn">🏥 Find Hospital</button>
+    <button id="sosBtn">🚨 EMERGENCY CALL</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    var hospitals = [
+      { name: "Mediheal Hospital", town: "Nakuru", phone: "0717877865", emergency: true, services: "general maternity emergency" },
+      { name: "Valley Hospital", town: "Nakuru", phone: "0512214207", emergency: true, services: "general maternity emergency" },
+      { name: "Nakuru War Memorial Hospital", town: "Nakuru", phone: "0512211990", emergency: true, services: "general emergency" },
+      { name: "Nakuru Level 6 Hospital", town: "Nakuru", phone: "0512212310", emergency: true, services: "general maternity emergency" },
+      { name: "Nairobi Women's Hospital Nakuru", town: "Nakuru", phone: "0713113499", emergency: true, services: "maternity general" },
+      { name: "Rhonda Maternity Clinic", town: "Nakuru", phone: "0512212310", emergency: false, services: "maternity" },
+      { name: "Bondeni Maternity Hospital", town: "Nakuru", phone: "0721750460", emergency: true, services: "maternity emergency" },
+      { name: "Nakuru Specialist Hospital", town: "Nakuru", phone: "0512216000", emergency: true, services: "general emergency" },
+      { name: "St Mary's Hospital Nakuru", town: "Nakuru", phone: "0512212151", emergency: true, services: "general maternity emergency" },
+      { name: "Afraha Hospital", town: "Nakuru", phone: "0512211500", emergency: true, services: "maternity emergency" },
+      { name: "Radiant Hospital Nakuru", town: "Nakuru", phone: "0709668888", emergency: true, services: "general maternity emergency" },
+      { name: "Al-Gadhir Medical Hospital", town: "Nakuru", phone: "0512213000", emergency: true, services: "general maternity emergency" },
+      { name: "Kenyatta National Hospital", town: "Nairobi", phone: "0202726300", emergency: true, services: "general maternity emergency" },
+      { name: "Nairobi Hospital", town: "Nairobi", phone: "0203845000", emergency: true, services: "general maternity emergency" },
+      { name: "Aga Khan Hospital Nairobi", town: "Nairobi", phone: "0203662000", emergency: true, services: "general maternity emergency" },
+      { name: "MP Shah Hospital", town: "Nairobi", phone: "0203742763", emergency: true, services: "general emergency" },
+      { name: "Karen Hospital", town: "Nairobi", phone: "0709982000", emergency: true, services: "general maternity emergency" },
+      { name: "Nairobi Women's Hospital", town: "Nairobi", phone: "0709667000", emergency: true, services: "maternity general" },
+      { name: "Jacaranda Maternity Hospital", town: "Nairobi", phone: "0800720021", emergency: true, services: "maternity" },
+      { name: "Mater Hospital", town: "Nairobi", phone: "0202025000", emergency: true, services: "general maternity emergency" },
+      { name: "Pumwani Maternity Hospital", town: "Nairobi", phone: "0202143000", emergency: true, services: "maternity emergency" },
+      { name: "Coast General Hospital", town: "Mombasa", phone: "0412314201", emergency: true, services: "general maternity emergency" },
+      { name: "Aga Khan Hospital Mombasa", town: "Mombasa", phone: "0412227710", emergency: true, services: "general maternity emergency" },
+      { name: "Mombasa Hospital", town: "Mombasa", phone: "0412312191", emergency: true, services: "general emergency" },
+      { name: "Pandya Memorial Hospital", town: "Mombasa", phone: "0412314140", emergency: true, services: "general maternity emergency" },
+      { name: "Jaramogi Oginga Odinga Hospital", town: "Kisumu", phone: "0572021138", emergency: true, services: "general maternity emergency" },
+      { name: "Aga Khan Hospital Kisumu", town: "Kisumu", phone: "0573022301", emergency: true, services: "general maternity emergency" },
+      { name: "Kisumu County Hospital", town: "Kisumu", phone: "0572020600", emergency: true, services: "general emergency" },
+      { name: "Moi Teaching & Referral Hospital", town: "Eldoret", phone: "0532033471", emergency: true, services: "general maternity emergency" },
+      { name: "Eldoret Hospital", town: "Eldoret", phone: "0532062000", emergency: true, services: "general maternity emergency" },
+      { name: "Nyeri County Referral Hospital", town: "Nyeri", phone: "0612030606", emergency: true, services: "general maternity emergency" },
+      { name: "Consolata Hospital Nyeri", town: "Nyeri", phone: "0612030210", emergency: true, services: "general maternity emergency" },
+      { name: "Meru County Referral Hospital", town: "Meru", phone: "0642031190", emergency: true, services: "general maternity emergency" },
+      { name: "Thika Level 5 Hospital", town: "Thika", phone: "0672021118", emergency: true, services: "general maternity emergency" },
+      { name: "Machakos County Hospital", town: "Machakos", phone: "0452021310", emergency: true, services: "general emergency" },
+      { name: "Kakamega County Hospital", town: "Kakamega", phone: "0562030104", emergency: true, services: "general maternity emergency" },
+      { name: "Kisii Teaching & Referral Hospital", town: "Kisii", phone: "0582030441", emergency: true, services: "general maternity emergency" },
+      { name: "Garissa County Referral Hospital", town: "Garissa", phone: "0462021012", emergency: true, services: "general emergency" },
+      { name: "Embu County Referral Hospital", town: "Embu", phone: "0681030058", emergency: true, services: "general maternity emergency" },
+      { name: "Kitale County Hospital", town: "Kitale", phone: "0545020028", emergency: true, services: "general emergency" },
+      { name: "Naivasha County Hospital", town: "Naivasha", phone: "0505021234", emergency: true, services: "general emergency" },
+      { name: "Narok County Referral Hospital", town: "Narok", phone: "0502021000", emergency: true, services: "general emergency" },
+      { name: "Kericho County Hospital", town: "Kericho", phone: "0522020600", emergency: true, services: "general emergency" },
+      { name: "Bomet County Hospital", town: "Bomet", phone: "0522021100", emergency: true, services: "general emergency" }
+    ];
+
+    document.getElementById('findBtn').onclick = function() {
+      var search = document.getElementById('search').value.toLowerCase();
+      var filter = document.getElementById('filter').value;
+      var results = document.getElementById('results');
+
+      if (search === '') {
+        results.innerHTML = '<p style="color:#FF3B3B;margin-top:16px">Please enter a location!</p>';
+        return;
+      }
+
+      var found = hospitals.filter(function(h) {
+        var matchesSearch = h.town.toLowerCase().includes(search) || h.name.toLowerCase().includes(search);
+        var matchesFilter = true;
+        if (filter === 'emergency') matchesFilter = h.emergency === true;
+        if (filter === 'maternity') matchesFilter = h.services.includes('maternity');
+        if (filter === 'general') matchesFilter = h.services.includes('general');
+        return matchesSearch && matchesFilter;
+      });
+
+      if (found.length === 0) {
+        results.innerHTML = '<p style="color:#FF3B3B;margin-top:16px">No hospitals found. Try another town or filter.</p>';
+      } else {
+        var html = '<h3 style="color:white;margin:20px 0 10px">Found ' + found.length + ' hospital(s):</h3>';
+        found.forEach(function(h) {
+          html += '<div style="background:#131D2E;border:1px solid #1E2D42;border-radius:10px;padding:16px;margin-bottom:10px;text-align:left">';
+          html += '<p style="color:white;font-weight:700;margin-bottom:6px">🏥 ' + h.name + '</p>';
+          html += '<p style="color:#64748B;margin-bottom:6px">📍 ' + h.town + '</p>';
+          if (h.emergency) {
+            html += '<span style="background:rgba(255,59,59,0.2);color:#FF3B3B;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px">🚨 Emergency</span> ';
+          }
+          html += '<span style="background:rgba(34,197,94,0.2);color:#22C55E;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px">' + h.services + '</span>';
+          html += '<br><a href="tel:' + h.phone + '" style="background:#FF3B3B;color:white;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:8px">📞 Call ' + h.phone + '</a>';
+          html += '</div>';
+        });
+        results.innerHTML = html;
+      }
+    };
+
+    document.getElementById('sosBtn').onclick = function() {
+      document.getElementById('results').innerHTML = '<div style="background:#C0392B;border-radius:10px;padding:16px;margin-top:20px"><p style="color:white;font-weight:700;font-size:18px">🚨 EMERGENCY MODE</p><p style="color:white;margin-top:8px">Nearest hospital: Mediheal Hospital</p><a href="tel:0717877865" style="background:white;color:#C0392B;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:10px">📞 Call Now — 0717877865</a></div>';
+    };
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          document.getElementById('search').value = 'Nakuru';
+          document.getElementById('findBtn').click();
+        }, function() {
+          document.getElementById('results').innerHTML = '<p style="color:#FF3B3B;margin-top:16px">❌ Could not detect location. Please type manually.</p>';
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
